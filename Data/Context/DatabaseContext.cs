@@ -18,7 +18,7 @@ namespace DataAccess.Context
         {
         }
 
-        public DbSet<Ocorrência> Ocorrência { get; set; }
+        public DbSet<Ocorrencia> Ocorrencia { get; set; }
         public DbSet<Pedido> Pedido { get; set; }
 
         

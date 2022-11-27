@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DataServices
 {
-    public class OcorrenciaService
+    public class OcorrenciaService : IOcorrenciaService
     {
         private readonly DatabaseContext _context;
 
@@ -23,13 +23,13 @@ namespace DataServices
         }
         public async Task DeleteAsync(int id)
         {
-            var entity = await _context.Set<Ocorrência>().FindAsync(id);
+            var entity = await _context.Set<Ocorrencia>().FindAsync(id);
 
             _context.Entry(entity).State = EntityState.Deleted;
             await ContextSaveAsync();
         }
 
-        private async Task<Ocorrência> PostAsync(Ocorrência entity)
+        private async Task<Ocorrencia> PostAsync(Ocorrencia entity)
         {
 
 
@@ -47,10 +47,10 @@ namespace DataServices
                     timeSinceCreated = DateTime.Now - entity.HoraOcorrencia;
                     if (timeSinceCreated.TotalMinutes <= 10) isValid = false;
                 });
-            if (!isValid) return null;
-               
+                if (!isValid) return null;
+
             }
-            await _context.Set<Ocorrência>().AddAsync(entity);
+            await _context.Set<Ocorrencia>().AddAsync(entity);
             await ContextSaveAsync();
             return entity;
         }
@@ -61,23 +61,24 @@ namespace DataServices
             await _context.SaveChangesAsync();
 
         }
-        private async Task<Ocorrência> PutAsync(Ocorrência entity)
+        private async Task<Ocorrencia> PutAsync(Ocorrencia entity)
         {
-            var dBentity = await _context.Set<Ocorrência>().FindAsync(entity.IdOcorrência);
+            var dBentity = await _context.Set<Ocorrencia>().FindAsync(entity.IdOcorrencia);
             if (dBentity == null)
             {
                 return null;
             }
 
             _context.Entry(entity).State = EntityState.Detached;
+            _context.Entry(dBentity).State = EntityState.Detached;
             _context.Entry(entity).State = EntityState.Modified;
             await ContextSaveAsync();
             return entity;
         }
 
-        public async Task<Ocorrência> SaveAsync(Ocorrência entity)
+        public async Task<Ocorrencia> SaveAsync(Ocorrencia entity)
         {
-            if (entity.IdOcorrência == 0)
+            if (entity.IdOcorrencia == 0)
                 entity = await PostAsync(entity);
             else
                 entity = await PutAsync(entity);
@@ -86,20 +87,31 @@ namespace DataServices
         }
 
 
-        public async Task<List<Ocorrência>> GetAllAsync()
+        public async Task<List<Ocorrencia>> GetAllAsync()
         {
 
 
-            var query = _context.Set<Ocorrência>().AsQueryable();
+            var query = _context.Set<Ocorrencia>().AsQueryable();
 
             var result = await query.AsNoTracking().ToListAsync();
             return result;
         }
 
-        public async Task<List<Ocorrência>> GetByFilterAsync(Expression<Func<Ocorrência, bool>> filter)
+        public async Task<Ocorrencia> SearchAsync(params object[] key)
+        {
+            var result = await _context.Set<Ocorrencia>().FindAsync(key);
+
+
+            if (result != null)
+                _context.Entry(result).State = EntityState.Detached;
+
+            return result;
+        }
+
+        public async Task<List<Ocorrencia>> GetByFilterAsync(Expression<Func<Ocorrencia, bool>> filter)
         {
 
-            IQueryable<Ocorrência> query = _context.Set<Ocorrência>()
+            IQueryable<Ocorrencia> query = _context.Set<Ocorrencia>()
                     .Where(filter)
                     .AsQueryable();
 
@@ -108,7 +120,7 @@ namespace DataServices
                 return query.AsNoTracking().ToList();
             else
             {
-                return Enumerable.Empty<Ocorrência>().ToList();
+                return Enumerable.Empty<Ocorrencia>().ToList();
             }
         }
     }

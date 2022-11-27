@@ -1,4 +1,5 @@
 using DataAccess.Context;
+using DataServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -37,34 +38,16 @@ namespace OcorrencyAPI
 
             services.AddControllersWithViews();
 
+            services.AddTransient<IOcorrenciaService, OcorrenciaService>();
+            services.AddTransient<IPedidoService, PedidoService>();
+
             services.AddDbContext<DatabaseContext>(options => options
                  .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Template Angular WebApi", Version = "v1", Description = "Api with authentication" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert Token",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    BearerFormat = "JWT",
-                    Scheme = "bearer"
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[]{ }
-                    }
-                });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Ocorrency API", Version = "v1", Description = "Ocorrency manage API" });
+                
             });
 
         }
@@ -86,7 +69,7 @@ namespace OcorrencyAPI
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("./v1/swagger.json", "TemplateApi v1");
+                c.SwaggerEndpoint("./v1/swagger.json", "OcorrencyAPI v1");
             });
 
             app.UseHttpsRedirection();
