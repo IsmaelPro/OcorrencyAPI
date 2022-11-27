@@ -10,23 +10,17 @@ using System.Threading.Tasks;
 
 namespace DataServices
 {
-    public class PedidoService : IPedidoService
+    public class PedidoService : BaseService<Pedido>, IPedidoService
     {
         private readonly DatabaseContext _context;
 
-        public PedidoService(DatabaseContext context)
+        public PedidoService(DatabaseContext context) : base(context)
         {
             _context = context;
 
 
         }
-        public async Task DeleteAsync(int id)
-        {
-            var entity = await _context.Set<Pedido>().FindAsync(id);
 
-            _context.Entry(entity).State = EntityState.Deleted;
-            await ContextSaveAsync();
-        }
 
         private async Task<Pedido> PostAsync(Pedido entity)
         {
@@ -37,12 +31,7 @@ namespace DataServices
             return entity;
         }
 
-        private async Task ContextSaveAsync()
-        {
 
-            await _context.SaveChangesAsync();
-
-        }
         private async Task<Pedido> PutAsync(Pedido entity)
         {
             var dBentity = await _context.Set<Pedido>().FindAsync(entity.IdPedido);
@@ -69,41 +58,5 @@ namespace DataServices
         }
 
 
-        public async Task<List<Pedido>> GetAllAsync()
-        {
-
-
-            var query = _context.Set<Pedido>().AsQueryable();
-
-            var result = await query.AsNoTracking().ToListAsync();
-            return result;
-        }
-
-        public async Task<Pedido> SearchAsync(params object[] key)
-        {
-            var result = await _context.Set<Pedido>().FindAsync(key);
-
-
-            if (result != null)
-                _context.Entry(result).State = EntityState.Detached;
-
-            return result;
-        }
-
-        public async Task<List<Pedido>> GetByFilterAsync(Expression<Func<Pedido, bool>> filter)
-        {
-
-            IQueryable<Pedido> query = _context.Set<Pedido>()
-                    .Where(filter)
-                    .AsQueryable();
-
-
-            if (query.Any())
-                return query.AsNoTracking().ToList();
-            else
-            {
-                return Enumerable.Empty<Pedido>().ToList();
-            }
-        }
     }
 }
