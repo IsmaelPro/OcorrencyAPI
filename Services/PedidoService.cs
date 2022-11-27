@@ -52,6 +52,7 @@ namespace DataServices
             }
 
             _context.Entry(entity).State = EntityState.Detached;
+            _context.Entry(dBentity).State = EntityState.Detached;
             _context.Entry(entity).State = EntityState.Modified;
             await ContextSaveAsync();
             return entity;
@@ -75,6 +76,17 @@ namespace DataServices
             var query = _context.Set<Pedido>().AsQueryable();
 
             var result = await query.AsNoTracking().ToListAsync();
+            return result;
+        }
+
+        public async Task<Pedido> SearchAsync(params object[] key)
+        {
+            var result = await _context.Set<Pedido>().FindAsync(key);
+
+
+            if (result != null)
+                _context.Entry(result).State = EntityState.Detached;
+
             return result;
         }
 

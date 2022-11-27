@@ -12,5 +12,6 @@ namespace DataServices
         Task<List<Pedido>> GetAllAsync();
         Task<List<Pedido>> GetByFilterAsync(Expression<Func<Pedido, bool>> filter);
         Task<Pedido> SaveAsync(Pedido entity);
+        Task<Pedido> SearchAsync(params object[] key);
     }
 }
